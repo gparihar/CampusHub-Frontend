@@ -48,6 +48,7 @@ export function AdminProvider({ children }) {
   const adminLogout = () => {
     setAdmin(null);
     localStorage.removeItem("campushub-admin");
+    localStorage.removeItem("adminToken");
   };
 
   return (

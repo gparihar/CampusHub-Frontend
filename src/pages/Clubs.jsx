@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Search, SlidersHorizontal, UsersRound } from "lucide-react";
 import { clubs } from "../data/clubs";
 import ClubCard from "../components/ClubCard";
+import EmptyState from "../components/EmptyState";
 
 function Clubs() {
   const [search, setSearch] = useState("");
@@ -28,87 +30,72 @@ function Clubs() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50">
-
-      {/* Header */}
-      <section className="bg-gradient-to-br from-indigo-600 to-purple-700 py-20 text-white">
-        <div className="mx-auto max-w-7xl px-6 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
-            Find Your Community
-          </p>
-
-          <h1 className="mt-3 text-4xl font-bold md:text-5xl">
+    <main className="min-h-screen bg-slate-50">
+      <section className="border-b border-slate-200 bg-white py-16">
+        <div className="ch-container text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <UsersRound className="h-7 w-7" />
+          </div>
+          <p className="ch-eyebrow mt-6">Find Your Community</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
             Explore Campus Clubs
           </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-indigo-100">
+          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
             Discover student communities, meet people who share your interests,
             and become part of something exciting.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="ch-container py-12">
+        <div className="ch-card p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4">
+              <Search className="h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search clubs..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-transparent py-3 outline-none"
+              />
+            </div>
 
-        {/* Search */}
-        <div className="mx-auto max-w-2xl">
-          <input
-            type="text"
-            placeholder="Search clubs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 bg-white px-5 py-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
+            <div className="flex flex-wrap gap-2">
+              {categories.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setCategory(item)}
+                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                    category === item
+                      ? "bg-indigo-600 text-white"
+                      : "border border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {categories.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setCategory(item)}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-                category === item
-                  ? "bg-indigo-600 text-white"
-                  : "border border-gray-300 bg-white text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
+        <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-slate-500">
+          <SlidersHorizontal className="h-4 w-4" />
+          Showing {filteredClubs.length} clubs
         </div>
 
-        {/* Club Results */}
-        <div className="mt-12">
-          <p className="mb-6 text-sm text-gray-500">
-            Showing {filteredClubs.length} clubs
-          </p>
-
+        <div className="mt-8">
           {filteredClubs.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
               {filteredClubs.map((club) => (
-                <ClubCard
-                  key={club.id}
-                  club={club}
-                />
+                <ClubCard key={club.id} club={club} />
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center">
-              <p className="text-5xl">🔍</p>
-
-              <h2 className="mt-4 text-xl font-bold text-gray-900">
-                No clubs found
-              </h2>
-
-              <p className="mt-2 text-gray-500">
-                Try another search or select a different category.
-              </p>
-            </div>
+            <EmptyState message="Try another search or select a different category." />
           )}
         </div>
-
       </section>
     </main>
   );

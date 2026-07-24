@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Search, Trash2, UserRound, UsersRound } from "lucide-react";
+import { CalendarDays, ClipboardList, Search, Trash2 } from "lucide-react";
 import api from "../api/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ApiErrorState from "../components/ApiErrorState";
 import EmptyState from "../components/EmptyState";
 
-function ManageStudents() {
-  const [students, setStudents] = useState([]);
+function ManageRegistrations() {
+  const [registrations, setRegistrations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,59 +16,70 @@ function ManageStudents() {
   const token = localStorage.getItem("adminToken");
 
   useEffect(() => {
-    fetchStudents();
+    fetchRegistrations();
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchRegistrations = async () => {
     try {
       setLoading(true);
       setError("");
-      const res = await api.get("/users", {
+
+      const res = await api.get("/registrations/admin", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setStudents(res.data.students);
+      setRegistrations(res.data.registrations || []);
     } catch (error) {
       console.error(error);
-      setError("Failed to fetch students");
+      setError(
+        error.response?.data?.message ||
+          "Failed to fetch registrations"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this student?")) return;
+    if (!window.confirm("Delete this registration?")) return;
 
     try {
       setDeletingId(id);
-      await api.delete(`/users/${id}`, {
+      await api.delete(`/registrations/admin/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      toast.success("Student deleted successfully!");
-      fetchStudents();
+      toast.success("Registration deleted successfully!");
+      fetchRegistrations();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete student");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete registration"
+      );
     } finally {
       setDeletingId("");
     }
   };
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRegistrations = registrations.filter((registration) => {
+    const search = searchTerm.toLowerCase();
+
+    return (
+      registration.studentName?.toLowerCase().includes(search) ||
+      registration.studentEmail?.toLowerCase().includes(search) ||
+      registration.eventTitle?.toLowerCase().includes(search)
+    );
+  });
 
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-10">
-        <LoadingSpinner text="Loading students..." />
+        <LoadingSpinner text="Loading registrations..." />
       </main>
     );
   }
@@ -81,18 +92,18 @@ function ManageStudents() {
             <div>
               <p className="ch-eyebrow">Admin</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
-                Manage Students
+                Manage Registrations
               </h1>
               <p className="mt-2 text-sm text-slate-500">
-                Search, review, and manage registered student accounts.
+                Monitor event registrations and remove entries when needed.
               </p>
             </div>
 
-            <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 lg:w-80">
+            <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 lg:w-96">
               <Search className="h-5 w-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search student..."
+                placeholder="Search registrations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-transparent py-3 outline-none"
@@ -103,15 +114,15 @@ function ManageStudents() {
 
         <section className="mt-8">
           {error ? (
-            <ApiErrorState message={error} onRetry={fetchStudents} />
-          ) : filteredStudents.length === 0 ? (
-            <EmptyState message="No students found." />
+            <ApiErrorState message={error} onRetry={fetchRegistrations} />
+          ) : filteredRegistrations.length === 0 ? (
+            <EmptyState message="No registrations found." />
           ) : (
             <div className="ch-card overflow-hidden">
               <div className="border-b border-slate-200 px-6 py-4">
                 <p className="flex items-center gap-2 text-sm font-bold text-slate-600">
-                  <UsersRound className="h-4 w-4 text-indigo-600" />
-                  Showing {filteredStudents.length} students
+                  <ClipboardList className="h-4 w-4 text-indigo-600" />
+                  Showing {filteredRegistrations.length} registrations
                 </p>
               </div>
 
@@ -119,38 +130,36 @@ function ManageStudents() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-slate-50 text-left text-xs font-black uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-6 py-4">Name</th>
+                      <th className="px-6 py-4">Student</th>
                       <th className="px-6 py-4">Email</th>
-                      <th className="px-6 py-4">Role</th>
-                      <th className="px-6 py-4">Joined</th>
+                      <th className="px-6 py-4">Event</th>
+                      <th className="px-6 py-4">Event Date</th>
                       <th className="px-6 py-4 text-center">Action</th>
                     </tr>
                   </thead>
 
                   <tbody className="divide-y divide-slate-100">
-                    {filteredStudents.map((student) => (
-                      <tr key={student._id} className="transition hover:bg-slate-50">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                              <UserRound className="h-4 w-4" />
-                            </div>
-                            <span className="font-bold text-slate-950">{student.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-slate-600">{student.email}</td>
-                        <td className="px-6 py-4 capitalize text-slate-600">{student.role}</td>
+                    {filteredRegistrations.map((registration) => (
+                      <tr key={registration._id} className="transition hover:bg-slate-50">
+                        <td className="px-6 py-4 font-bold text-slate-950">{registration.studentName}</td>
+                        <td className="px-6 py-4 text-slate-600">{registration.studentEmail}</td>
+                        <td className="px-6 py-4 text-slate-600">{registration.eventTitle}</td>
                         <td className="px-6 py-4 text-slate-600">
-                          {new Date(student.createdAt).toLocaleDateString()}
+                          <span className="inline-flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4 text-indigo-600" />
+                            {registration.eventDate
+                              ? new Date(registration.eventDate).toLocaleDateString()
+                              : "N/A"}
+                          </span>
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={() => handleDelete(student._id)}
-                            disabled={deletingId === student._id}
+                            onClick={() => handleDelete(registration._id)}
+                            disabled={deletingId === registration._id}
                             className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 font-bold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <Trash2 className="h-4 w-4" />
-                            {deletingId === student._id ? "Deleting..." : "Delete"}
+                            {deletingId === registration._id ? "Deleting..." : "Delete"}
                           </button>
                         </td>
                       </tr>
@@ -166,4 +175,4 @@ function ManageStudents() {
   );
 }
 
-export default ManageStudents;
+export default ManageRegistrations;

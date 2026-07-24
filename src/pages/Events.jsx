@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
+import { CalendarDays, Search, SlidersHorizontal } from "lucide-react";
 import api from "../api/api";
 import EventCard from "../components/EventCard";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ApiErrorState from "../components/ApiErrorState";
+import EmptyState from "../components/EmptyState";
 
 function Events() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await api.get("/events");
+      setEvents(res.data.events);
+    } catch (error) {
+      console.error("Failed to fetch events:", error);
+      setError("Failed to fetch events");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await api.get("/events");
-        setEvents(res.data.events);
-      } catch (error) {
-        console.error("Failed to fetch events:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchEvents();
   }, []);
 
@@ -27,72 +35,57 @@ function Events() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <section className="bg-gradient-to-br from-indigo-600 to-purple-700 py-20 text-white">
-        <div className="mx-auto max-w-7xl px-6 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
-            Campus Life
-          </p>
-
-          <h1 className="mt-3 text-4xl font-bold md:text-5xl">
+    <main className="min-h-screen bg-slate-50">
+      <section className="border-b border-slate-200 bg-white py-16">
+        <div className="ch-container text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <CalendarDays className="h-7 w-7" />
+          </div>
+          <p className="ch-eyebrow mt-6">Campus Life</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
             Discover Campus Events
           </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-indigo-100">
+          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
             Explore upcoming events, workshops, competitions and activities
             happening around your campus.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        {/* Search */}
-        <div className="mx-auto max-w-2xl">
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 bg-white px-5 py-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
+      <section className="ch-container py-12">
+        <div className="ch-card p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4">
+              <Search className="h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search events..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-transparent py-3 outline-none"
+              />
+            </div>
+
+            <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-500">
+              <SlidersHorizontal className="h-4 w-4" />
+              Showing {filteredEvents.length}
+            </div>
+          </div>
         </div>
 
-        {/* Results */}
-        <div className="mt-12">
+        <div className="mt-10">
           {loading ? (
-            <div className="text-center py-20">
-              <p className="text-lg text-gray-500">Loading events...</p>
+            <LoadingSpinner text="Loading events..." />
+          ) : error ? (
+            <ApiErrorState message={error} onRetry={fetchEvents} />
+          ) : filteredEvents.length > 0 ? (
+            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+              {filteredEvents.map((event) => (
+                <EventCard key={event._id} event={event} />
+              ))}
             </div>
           ) : (
-            <>
-              <p className="mb-6 text-sm text-gray-500">
-                Showing {filteredEvents.length} events
-              </p>
-
-              {filteredEvents.length > 0 ? (
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredEvents.map((event) => (
-                    <EventCard
-                      key={event._id}
-                      event={event}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-20 text-center">
-                  <p className="text-5xl">🔍</p>
-
-                  <h2 className="mt-4 text-xl font-bold text-gray-900">
-                    No events found
-                  </h2>
-
-                  <p className="mt-2 text-gray-500">
-                    No events are available right now.
-                  </p>
-                </div>
-              )}
-            </>
+            <EmptyState message="No events are available right now." />
           )}
         </div>
       </section>

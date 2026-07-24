@@ -5,8 +5,10 @@ import AdminDashboard from "./admin/AdminDashboard";
 import ManageEvents from "./admin/ManageEvents";
 import ManageClubs from "./admin/ManageClubs";
 import ManageStudents from "./admin/ManageStudents";
+import ManageRegistrations from "./admin/ManageRegistrations";
 
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -21,6 +23,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
 
 import Dashboard from "./dashboard/Dashboard";
 import MyEvents from "./dashboard/MyEvents";
@@ -74,6 +77,15 @@ function App() {
   }
 />
 
+<Route
+  path="/admin/registrations"
+  element={
+    <AdminProtectedRoute>
+      <ManageRegistrations />
+    </AdminProtectedRoute>
+  }
+/>
+
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetails />} />
@@ -88,10 +100,40 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/events" element={<MyEvents />} />
-        <Route path="/dashboard/clubs" element={<MyClubs />} />
-        <Route path="/dashboard/profile" element={<Profile />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/events"
+          element={
+            <ProtectedRoute>
+              <MyEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/clubs"
+          element={
+            <ProtectedRoute>
+              <MyClubs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <Footer />

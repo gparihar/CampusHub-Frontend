@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+}
+
+@layer components {
+  .ch-container {
+    @apply mx-auto max-w-7xl px-6 lg:px-8;
+  }
+
+  .ch-card {
+    @apply rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300;
+  }
+
+  .ch-card-hover {
+    @apply hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-slate-200/70;
+  }
+
+  .ch-button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .ch-button-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .ch-eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.18em] text-indigo-600;
+  }
+
+  .ch-input {
+    @apply rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100;
+  }
+}

@@ -1,4 +1,11 @@
 import { NavLink, Link, useNavigate } from "react-router-dom";
+import {
+  GraduationCap,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
@@ -20,28 +27,28 @@ function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
-        {/* Logo */}
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+      <div className="ch-container flex items-center justify-between py-4">
         <Link
           to="/"
-          className="text-2xl font-bold tracking-tight text-gray-900"
+          className="flex items-center gap-2 text-xl font-bold tracking-tight text-slate-950"
         >
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
+            <GraduationCap className="h-5 w-5" />
+          </span>
           Campus<span className="text-indigo-600">Hub</span>
         </Link>
 
-        {/* Navigation */}
-        <div className="hidden items-center gap-8 lg:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           {navItems.map((item) => (
             <NavLink
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `text-sm font-medium transition ${
+                `rounded-full px-3 py-2 text-sm font-semibold transition ${
                   isActive
-                    ? "text-indigo-600"
-                    : "text-gray-600 hover:text-indigo-600"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                 }`
               }
             >
@@ -50,23 +57,23 @@ function Navbar() {
           ))}
         </div>
 
-        {/* User Actions */}
         <div className="flex items-center gap-3">
           {user ? (
             <>
               <Link
                 to="/dashboard"
-                className="hidden text-sm font-semibold text-gray-700 transition hover:text-indigo-600 sm:block"
+                className="hidden items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-indigo-600 sm:flex"
               >
+                <LayoutDashboard className="h-4 w-4" />
                 Dashboard
               </Link>
 
-              <div className="hidden items-center gap-2 rounded-full bg-indigo-50 px-4 py-2 md:flex">
+              <div className="hidden items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-2 md:flex">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
                   {user.name?.charAt(0).toUpperCase()}
                 </div>
 
-                <span className="text-sm font-medium text-indigo-700">
+                <span className="text-sm font-semibold text-indigo-700">
                   {user.name}
                 </span>
               </div>
@@ -74,8 +81,9 @@ function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+                className="ch-button-secondary hover:border-red-200 hover:bg-red-50 hover:text-red-600"
               >
+                <LogOut className="h-4 w-4" />
                 Logout
               </button>
             </>
@@ -83,21 +91,19 @@ function Navbar() {
             <>
               <Link
                 to="/login"
-                className="hidden px-4 py-2 font-medium text-gray-700 transition hover:text-indigo-600 sm:block"
+                className="hidden items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-indigo-600 sm:flex"
               >
+                <LogIn className="h-4 w-4" />
                 Login
               </Link>
 
-              <Link
-                to="/register"
-                className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
-              >
+              <Link to="/register" className="ch-button-primary">
+                <UserRound className="h-4 w-4" />
                 Join CampusHub
               </Link>
             </>
           )}
         </div>
-
       </div>
     </nav>
   );

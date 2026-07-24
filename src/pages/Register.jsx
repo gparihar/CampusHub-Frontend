@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { BookOpen, GraduationCap, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/api";
 
@@ -13,6 +15,7 @@ function Register() {
     password: "",
     course: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +28,7 @@ function Register() {
   e.preventDefault();
 
   try {
+    setSubmitting(true);
     await api.post("/auth/register", formData);
 
     const result = await login(
@@ -36,118 +40,142 @@ function Register() {
       navigate("/dashboard");
     }
   } catch (error) {
-    alert(
+    toast.error(
       error.response?.data?.message ||
       "Registration failed"
     );
+  } finally {
+    setSubmitting(false);
   }
 };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-        <div className="text-center">
-          <Link to="/" className="text-2xl font-bold text-gray-900">
-            Campus<span className="text-indigo-600">Hub</span>
-          </Link>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-16">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/70 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="p-8 sm:p-10">
+          <div className="text-center lg:text-left">
+            <Link to="/" className="inline-flex items-center gap-2 text-2xl font-black text-slate-950">
+              <GraduationCap className="h-7 w-7 text-indigo-600" />
+              Campus<span className="text-indigo-600">Hub</span>
+            </Link>
 
-          <h1 className="mt-6 text-2xl font-bold text-gray-900">
-            Create your account
-          </h1>
+            <h1 className="mt-6 text-3xl font-black tracking-tight text-slate-950">
+              Create your account
+            </h1>
 
-          <p className="mt-2 text-sm text-gray-500">
-            Join your campus community today.
+            <p className="mt-2 text-sm text-slate-500">
+              Join your campus community today.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div>
+              <label className="text-sm font-bold text-slate-700">
+                Full Name
+              </label>
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-slate-200 px-4 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
+                <UserRound className="h-5 w-5 text-slate-400" />
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  className="w-full bg-transparent py-3 outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-slate-700">
+                Email Address
+              </label>
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-slate-200 px-4 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
+                <Mail className="h-5 w-5 text-slate-400" />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="student@example.com"
+                  className="w-full bg-transparent py-3 outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-slate-700">
+                Course
+              </label>
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-slate-200 px-4 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
+                <BookOpen className="h-5 w-5 text-slate-400" />
+                <select
+                  name="course"
+                  required
+                  value={formData.course}
+                  onChange={handleChange}
+                  className="w-full bg-transparent py-3 outline-none"
+                >
+                  <option value="">Select your course</option>
+                  <option value="BCA">BCA</option>
+                  <option value="BBA">BBA</option>
+                  <option value="BCom">B.Com</option>
+                  <option value="BA">BA</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-slate-700">
+                Password
+              </label>
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-slate-200 px-4 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
+                <LockKeyhole className="h-5 w-5 text-slate-400" />
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  minLength="6"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Minimum 6 characters"
+                  className="w-full bg-transparent py-3 outline-none"
+                />
+              </div>
+            </div>
+
+            <button type="submit" disabled={submitting} className="ch-button-primary w-full">
+              {submitting ? "Creating..." : "Create Account"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Already have an account?{" "}
+            <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-700">
+              Login
+            </Link>
           </p>
-        </div>
+        </section>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500"
-            />
+        <section className="hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500">
+            <GraduationCap className="h-7 w-7" />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="student@example.com"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500"
-            />
+            <p className="ch-eyebrow text-indigo-300">Start strong</p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight">
+              Turn campus opportunities into a clear plan.
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              Your account gives you access to event registrations, club
+              memberships, and your personal dashboard.
+            </p>
           </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Course
-            </label>
-
-            <select
-              name="course"
-              required
-              value={formData.course}
-              onChange={handleChange}
-              className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500"
-            >
-              <option value="">Select your course</option>
-              <option value="BCA">BCA</option>
-              <option value="BBA">BBA</option>
-              <option value="BCom">B.Com</option>
-              <option value="BA">BA</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              required
-              minLength="6"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Minimum 6 characters"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-700"
-          >
-            Create Account
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-indigo-600 hover:text-indigo-700"
-          >
-            Login
-          </Link>
-        </p>
+        </section>
       </div>
     </main>
   );
