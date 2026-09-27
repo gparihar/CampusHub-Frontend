@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
+  ShieldCheck,
   UserRound,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -19,6 +20,7 @@ function Navbar() {
     { name: "Gallery", path: "/gallery" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
+    { name: "Admin", path: "/admin/login", icon: ShieldCheck },
   ];
 
   const handleLogout = () => {
@@ -45,13 +47,14 @@ function Navbar() {
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `rounded-full px-3 py-2 text-sm font-semibold transition ${
+                `inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold transition ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                 }`
               }
             >
+              {item.icon && <item.icon className="mr-1.5 h-4 w-4" />}
               {item.name}
             </NavLink>
           ))}

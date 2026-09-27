@@ -14,6 +14,7 @@ function AdminLogin() {
 
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -112,7 +113,7 @@ function AdminLogin() {
               <div className="mt-2 flex items-center gap-3 rounded-xl border border-slate-200 px-4 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
                 <LockKeyhole className="h-5 w-5 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   required
                   value={formData.password}
@@ -121,6 +122,15 @@ function AdminLogin() {
                   className="w-full bg-transparent py-3 outline-none"
                 />
               </div>
+              <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                Show password
+              </label>
             </div>
 
             <button type="submit" disabled={submitting} className="ch-button-primary w-full">
@@ -128,11 +138,6 @@ function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
-            <p className="font-bold text-slate-700">Temporary development login:</p>
-            <p className="mt-2">Email: admin@campushub.com</p>
-            <p>Password: admin123</p>
-          </div>
         </section>
       </div>
     </main>
